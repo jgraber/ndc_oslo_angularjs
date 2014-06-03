@@ -1,15 +1,40 @@
 ﻿(function() {
 
-    var MoviesController = function ($scope, movieService, $log) {
+    var MovieListController = function (
+            $scope, movieService,
+            $log, $location, $anchorScroll) {
 
-        var onMovies = function(response) {
-            $scope.movies = response.data;
+
+        $scope.closeAlert = function(index) {
+            $scope.alerts.splice(index, 1);
+        };
+
+        $scope.alerts = [
+            {
+                type: "warning",
+                message: "This is a warning from MovieController",
+                reason: ""
+            },
+            {
+                type: "info",
+                message: "This is some information",
+                reason: ""
+            }
+        ];
+
+        var onMovies = function(movies) {
+            $scope.movies = movies;
         };
 
         var onError = function(reason) {
-            $scope.error = "There was a problem";
+            $scope.error = reason;
         };
 
+
+        $scope.createError = function() {
+            throw "oops!!!";
+        };
+       
         movieService.getAll()
             .then(onMovies, onError);
                          
@@ -21,31 +46,10 @@
         $scope.decrease = function (movie) {
             movie.rating -= 1;
         };
-
-        $scope.edit = function(movie) {
-            $scope.editableMovie = angular.copy(movie);
-        };
-
-        $scope.save = function(movie) {
-            movieService
-                .save(movie)
-                .then(function() {
-                    return movieService.getAll();
-                })
-                .then(function(response) {
-                    $scope.movies = response.data;
-                    $scope.editableMovie = null;
-                })
-                .catch(onError);
-        };
-
-        $scope.cancelEdit = function() {
-            $scope.editableMovie = null;
-        };
     };    
 
     var module = angular.module("atTheMovies");
-    module.controller("MoviesController", MoviesController);
+    module.controller("MovieListController", MovieListController);
 
 }());
 
